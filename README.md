@@ -1,6 +1,15 @@
 # 🎈 The General Purpose Student Database
 
-A simple guestbook application!
+a fully functional message board system with:
+
+Message posting with tags and images 📝
+Comment system with threaded discussions 💬
+Search functionality 🔍
+Tag filtering system 🏷️
+Image support 🖼️
+Markdown formatting support
+
+Feel free to reach out if you want to add any new features or need help with modifications in the future!
 
 <bit.ly/thegpsd/>
 
