@@ -26,17 +26,21 @@ A simple interface to input text
 
 Added timestamp
 
-# 1.2
+# v1.2
 
 Added ability to format text and add image
 
-# 1.3
+# v1.3
 
 Added UI update
 
-# 1.4
+# v1.4
 
 Added search and Subject Tags
+
+# v1.5
+
+Added ability to comment on posts
 
 
    
