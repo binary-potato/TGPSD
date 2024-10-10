@@ -17,3 +17,22 @@ A simple guestbook application!
    ```
    $ streamlit run streamlit_app.py
    ```
+
+# v1.0
+
+A simple interface to input text
+
+# v1.1
+
+Added timestamp
+
+# 1.2
+
+Added ability to format text and add image
+
+# 1.3
+
+Added UI update
+
+
+   
