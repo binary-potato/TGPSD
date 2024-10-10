@@ -34,5 +34,9 @@ Added ability to format text and add image
 
 Added UI update
 
+# 1.4
+
+Added search and Subject Tags
+
 
    
