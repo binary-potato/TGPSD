@@ -56,4 +56,18 @@ Added ability to comment on posts
 Added ability to create private/public threads
 
 
-   
+   **How to use:**
+- You can format your message using Markdown. For example:
+- Use `**bold**` for bold text.
+- Use `*italic*` for italic text.
+- Use - for lists.
+- Emojis are supported too! 🎉
+- Add tags to categorize your message
+- Comment on messages to start discussions
+- Optionally, upload an image with your message (PNG, JPG, JPEG, GIF).
+- Create public threads visible to everyone or private threads for specific discussions
+- You can format your message using **Markdown**
+- Add tags to categorize your message
+- Comment on messages to start discussions
+- Optionally, upload an image with your message
+""")
