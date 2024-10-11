@@ -51,5 +51,9 @@ Added search and Subject Tags
 
 Added ability to comment on posts
 
+# v1.6
+
+Added ability to create private/public threads
+
 
    
