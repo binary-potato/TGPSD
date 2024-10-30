@@ -53,7 +53,12 @@ Added ability to comment on posts
 
 # v1.6
 
-Added ability to create private/public threads
+UI update w/ 3 buttons
+
+ ```
+   we are adding ability for threads
+   ```
+
 
 
    **How to use:**
