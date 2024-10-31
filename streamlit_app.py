@@ -27,23 +27,20 @@ def migrate_datas():
         try:
             with open(dataS_FILE, "r") as f:
                 datas = json.load(f)
-            
-            # Check if any data needs an ID
-            modified = False
-            for msg in datas:
-                if 'id' not in msg:
-                    msg['id'] = str(uuid.uuid4())
-                    modified = True
-                if 'comments' not in msg:
-                    msg['comments'] = []
-                    modified = True
-            
-            # Save if modifications were made
-            if modified:
-                with open(dataS_FILE, "w") as f:
-                    json.dump(datas, f, indent=4)
-            
-            return datas
+                # Check if any data needs an ID
+                modified = False
+                for msg in datas:
+                    if 'id' not in msg:
+                        msg['id'] = str(uuid.uuid4())
+                        modified = True
+                    if 'comments' not in msg:
+                        msg['comments'] = []
+                        modified = True
+                # Save if modifications were made
+                if modified:
+                    with open(dataS_FILE, "w") as f:
+                        json.dump(datas, f, indent=4)
+                return datas
         except (json.JSONDecodeError, ValueError):
             return []
     return []
@@ -79,7 +76,6 @@ def save_data(name, data, tags, image_filename=None):
 def add_comment(data_id, commenter_name, comment_text):
     datas = load_datas()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
     for msg in datas:
         if msg["id"] == data_id:
             if "comments" not in msg:
@@ -90,7 +86,6 @@ def add_comment(data_id, commenter_name, comment_text):
                 "timestamp": timestamp
             })
             break
-    
     save_datas(datas)
 
 # Set page title and header
@@ -118,10 +113,10 @@ For students who want to make a mark. Report false identity at chuisaac2014b@gma
 
 **How to use:**
 - You can format your data using **Markdown**. For example:
-  - Use `**bold**` for bold text.
-  - Use `*italic*` for italic text.
-  - Use `-` for lists.
-  - Emojis are supported too! 🎉
+- Use `**bold**` for bold text.
+- Use `*italic*` for italic text.
+- Use `-` for lists.
+- Emojis are supported too! 🎉
 - Add or create tags to categorize your data
 - Comment on datas to start discussions
 - Optionally, upload an image with your data (PNG, JPG, JPEG, GIF).
@@ -132,7 +127,7 @@ col1, col2, col3 = st.columns(3)
 
 # Initialize session state for active page if not exists
 if 'active_page' not in st.session_state:
-    st.session_state.active_page = None
+    st.session_state.active_page = "view"  # Default to view
 
 with col1:
     if st.button("📝 Create data", use_container_width=True):
@@ -141,19 +136,19 @@ with col1:
 with col3:
     if st.button("📖 View All datas", use_container_width=True):
         st.session_state.active_page = "view"
+        # Clear search when viewing all
+        search_query = ""
 
 # Handle different pages
 if st.session_state.active_page == "create":
     st.markdown("### Create New data")
     name = st.text_input("Enter your name:", max_chars=50)
     data = st.text_area("Enter your data:", height=150)
-    
     # Tag selection with option to add new tags
     data_tags = st.multiselect("Select or add new tags:", existing_tags)
     new_data_tag = st.text_input("Add a new tag for this data:")
     if new_data_tag and new_data_tag not in data_tags:
         data_tags.append(new_data_tag)
-    
     uploaded_image = st.file_uploader("Upload an image (optional):", type=["png", "jpg", "jpeg", "gif"])
     
     if st.button("Submit data"):
@@ -170,7 +165,6 @@ if st.session_state.active_page == "create":
                 file_extension = os.path.splitext(uploaded_image.name)[1]
                 image_filename = f"{unique_id}{file_extension}"
                 image_path = os.path.join(IMAGES_DIR, image_filename)
-                
                 try:
                     image = Image.open(uploaded_image)
                     image.save(image_path)
@@ -184,20 +178,19 @@ if st.session_state.active_page == "create":
             st.rerun()
 
 # Display datas (for both search and view pages)
-if st.session_state.active_page in ["search", "view"]:
+if st.session_state.active_page == "view":
     datas = load_datas()
     filtered_datas = datas
 
-    if st.session_state.active_page == "search":
-        st.markdown("### Search Results")
-        if search_query:
-            search_query = search_query.lower()
-            filtered_datas = [
-                msg for msg in filtered_datas
-                if search_query in msg['name'].lower() or 
-                search_query in msg['data'].lower() or 
-                any(search_query in tag.lower() for tag in msg.get('tags', []))
-            ]
+    # Apply search filter if query exists
+    if search_query:
+        filtered_datas = [
+            msg for msg in filtered_datas
+            if (search_query.lower() in msg['name'].lower() or 
+                search_query.lower() in msg['data'].lower() or 
+                any(search_query.lower() in tag.lower() for tag in msg.get('tags', [])))
+        ]
+        st.markdown(f"### Search Results for '{search_query}'")
     else:
         st.markdown("### All datas")
 
