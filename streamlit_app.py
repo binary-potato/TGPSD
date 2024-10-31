@@ -6,31 +6,31 @@ import uuid
 from PIL import Image
 
 # Constants
-MESSAGES_FILE = "messages.json"
+dataS_FILE = "datas.json"
 IMAGES_DIR = "images"
 
 # Ensure the images directory exists
 if not os.path.exists(IMAGES_DIR):
     os.makedirs(IMAGES_DIR)
 
-# Function to load tags from messages
+# Function to load tags from datas
 def get_existing_tags():
-    messages = load_messages()
+    datas = load_datas()
     tags = set()
-    for msg in messages:
+    for msg in datas:
         tags.update(msg.get('tags', []))
     return sorted(list(tags))
 
-# Function to migrate existing messages and add IDs if missing
-def migrate_messages():
-    if os.path.exists(MESSAGES_FILE):
+# Function to migrate existing datas and add IDs if missing
+def migrate_datas():
+    if os.path.exists(dataS_FILE):
         try:
-            with open(MESSAGES_FILE, "r") as f:
-                messages = json.load(f)
+            with open(dataS_FILE, "r") as f:
+                datas = json.load(f)
             
-            # Check if any message needs an ID
+            # Check if any data needs an ID
             modified = False
-            for msg in messages:
+            for msg in datas:
                 if 'id' not in msg:
                     msg['id'] = str(uuid.uuid4())
                     modified = True
@@ -40,48 +40,48 @@ def migrate_messages():
             
             # Save if modifications were made
             if modified:
-                with open(MESSAGES_FILE, "w") as f:
-                    json.dump(messages, f, indent=4)
+                with open(dataS_FILE, "w") as f:
+                    json.dump(datas, f, indent=4)
             
-            return messages
+            return datas
         except (json.JSONDecodeError, ValueError):
             return []
     return []
 
-# Function to load messages
-def load_messages():
-    messages = migrate_messages()  # This will ensure all messages have IDs
-    return messages
+# Function to load datas
+def load_datas():
+    datas = migrate_datas()  # This will ensure all datas have IDs
+    return datas
 
-# Function to save messages
-def save_messages(messages):
-    with open(MESSAGES_FILE, "w") as f:
-        json.dump(messages, f, indent=4)
+# Function to save datas
+def save_datas(datas):
+    with open(dataS_FILE, "w") as f:
+        json.dump(datas, f, indent=4)
 
-# Function to save a new message
-def save_message(name, message, tags, image_filename=None):
-    messages = load_messages()
+# Function to save a new data
+def save_data(name, data, tags, image_filename=None):
+    datas = load_datas()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    message_id = str(uuid.uuid4())
-    messages.append({
-        "id": message_id,
+    data_id = str(uuid.uuid4())
+    datas.append({
+        "id": data_id,
         "name": name,
-        "message": message,
+        "data": data,
         "timestamp": timestamp,
         "image": image_filename,
         "tags": tags,
         "comments": []
     })
-    save_messages(messages)
-    return message_id
+    save_datas(datas)
+    return data_id
 
 # Function to add a comment
-def add_comment(message_id, commenter_name, comment_text):
-    messages = load_messages()
+def add_comment(data_id, commenter_name, comment_text):
+    datas = load_datas()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    for msg in messages:
-        if msg["id"] == message_id:
+    for msg in datas:
+        if msg["id"] == data_id:
             if "comments" not in msg:
                 msg["comments"] = []
             msg["comments"].append({
@@ -91,7 +91,7 @@ def add_comment(message_id, commenter_name, comment_text):
             })
             break
     
-    save_messages(messages)
+    save_datas(datas)
 
 # Set page title and header
 st.set_page_config(page_title="TGPSD", page_icon="📓", layout="wide")
@@ -101,8 +101,8 @@ st.sidebar.title("TGPSD")
 
 # Search and Filter Section in sidebar with search icon
 st.sidebar.header("🔍 Search and Filter")
-search_query = st.sidebar.text_input("Search messages:", "", 
-    placeholder="Search by name, message, or tags...")
+search_query = st.sidebar.text_input("Search datas:", "", 
+    placeholder="Search by name, data, or tags...")
 
 # Get existing tags and allow adding new ones
 existing_tags = get_existing_tags()
@@ -117,14 +117,14 @@ st.subheader("""
 For students who want to make a mark. Report false identity at chuisaac2014b@gmail.com
 
 **How to use:**
-- You can format your message using **Markdown**. For example:
+- You can format your data using **Markdown**. For example:
   - Use `**bold**` for bold text.
   - Use `*italic*` for italic text.
   - Use `-` for lists.
   - Emojis are supported too! 🎉
-- Add or create tags to categorize your message
-- Comment on messages to start discussions
-- Optionally, upload an image with your message (PNG, JPG, JPEG, GIF).
+- Add or create tags to categorize your data
+- Comment on datas to start discussions
+- Optionally, upload an image with your data (PNG, JPG, JPEG, GIF).
 """)
 
 # Create three columns for the main action buttons
@@ -135,33 +135,33 @@ if 'active_page' not in st.session_state:
     st.session_state.active_page = None
 
 with col1:
-    if st.button("📝 Create Message", use_container_width=True):
+    if st.button("📝 Create data", use_container_width=True):
         st.session_state.active_page = "create"
 
 with col3:
-    if st.button("📖 View All Messages", use_container_width=True):
+    if st.button("📖 View All datas", use_container_width=True):
         st.session_state.active_page = "view"
 
 # Handle different pages
 if st.session_state.active_page == "create":
-    st.markdown("### Create New Message")
+    st.markdown("### Create New data")
     name = st.text_input("Enter your name:", max_chars=50)
-    message = st.text_area("Enter your message:", height=150)
+    data = st.text_area("Enter your data:", height=150)
     
     # Tag selection with option to add new tags
-    message_tags = st.multiselect("Select or add new tags:", existing_tags)
-    new_message_tag = st.text_input("Add a new tag for this message:")
-    if new_message_tag and new_message_tag not in message_tags:
-        message_tags.append(new_message_tag)
+    data_tags = st.multiselect("Select or add new tags:", existing_tags)
+    new_data_tag = st.text_input("Add a new tag for this data:")
+    if new_data_tag and new_data_tag not in data_tags:
+        data_tags.append(new_data_tag)
     
     uploaded_image = st.file_uploader("Upload an image (optional):", type=["png", "jpg", "jpeg", "gif"])
     
-    if st.button("Submit Message"):
+    if st.button("Submit data"):
         if not name.strip():
             st.error("Please enter your name.")
-        elif not message.strip():
-            st.error("Please enter a message.")
-        elif not message_tags:
+        elif not data.strip():
+            st.error("Please enter a data.")
+        elif not data_tags:
             st.error("Please select at least one tag.")
         else:
             image_filename = None
@@ -178,50 +178,50 @@ if st.session_state.active_page == "create":
                     st.error(f"Error saving image: {e}")
                     image_filename = None
 
-            save_message(name, message, message_tags, image_filename)
-            st.success("Message posted successfully!")
+            save_data(name, data, data_tags, image_filename)
+            st.success("data posted successfully!")
             st.session_state.active_page = "view"
             st.rerun()
 
-# Display messages (for both search and view pages)
+# Display datas (for both search and view pages)
 if st.session_state.active_page in ["search", "view"]:
-    messages = load_messages()
-    filtered_messages = messages
+    datas = load_datas()
+    filtered_datas = datas
 
     if st.session_state.active_page == "search":
         st.markdown("### Search Results")
         if search_query:
             search_query = search_query.lower()
-            filtered_messages = [
-                msg for msg in filtered_messages
+            filtered_datas = [
+                msg for msg in filtered_datas
                 if search_query in msg['name'].lower() or 
-                search_query in msg['message'].lower() or 
+                search_query in msg['data'].lower() or 
                 any(search_query in tag.lower() for tag in msg.get('tags', []))
             ]
     else:
-        st.markdown("### All Messages")
+        st.markdown("### All datas")
 
     # Apply tag filter
     if selected_tags:
-        filtered_messages = [
-            msg for msg in filtered_messages
+        filtered_datas = [
+            msg for msg in filtered_datas
             if any(tag in msg.get('tags', []) for tag in selected_tags)
         ]
 
-    if not filtered_messages:
-        st.info("🔍 No messages found matching your criteria.")
+    if not filtered_datas:
+        st.info("🔍 No datas found matching your criteria.")
     
-    for msg in reversed(filtered_messages):
+    for msg in reversed(filtered_datas):
         with st.container():
-            # Message header with name, timestamp, and tags
+            # data header with name, timestamp, and tags
             col1, col2 = st.columns([3, 1])
             with col1:
                 st.markdown(f"**{msg['name']}** *({msg['timestamp']})*")
             with col2:
                 st.markdown(" ".join([f"`{tag}`" for tag in msg.get('tags', [])]))
             
-            # Message content
-            st.markdown(msg['message'])
+            # data content
+            st.markdown(msg['data'])
             
             # Display image if present
             if msg.get('image'):
