@@ -93,8 +93,37 @@ def add_comment(message_id, commenter_name, comment_text):
     
     save_messages(messages)
 
+# Custom CSS for square buttons
+square_button_css = """
+<style>
+.stButton > button {
+    width: 200px !important;
+    height: 200px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: normal !important;
+    padding: 20px !important;
+    font-size: 1.2em !important;
+}
+
+.button-icon {
+    font-size: 3em !important;
+    margin-bottom: 10px !important;
+}
+
+.button-text {
+    text-align: center !important;
+}
+</style>
+"""
+
 # Set page title and header
 st.set_page_config(page_title="TGPSD", page_icon="📓", layout="wide")
+
+# Inject custom CSS
+st.markdown(square_button_css, unsafe_allow_html=True)
 
 # Sidebar
 st.sidebar.title("TGPSD")
@@ -127,23 +156,34 @@ For students who want to make a mark. Report false identity at chuisaac2014b@gma
 - Optionally, upload an image with your message (PNG, JPG, JPEG, GIF).
 """)
 
-# Create three columns for the main action buttons
-col1, col2, col3 = st.columns(3)
+# Create two columns for the main action buttons with custom HTML
+col1, col2 = st.columns(2)
 
 # Initialize session state for active page if not exists
 if 'active_page' not in st.session_state:
     st.session_state.active_page = None
 
+# Custom button HTML
+create_button_html = """
+<button style="width: 200px; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: auto;">
+    <div style="font-size: 3em; margin-bottom: 10px;">📝</div>
+    <div style="text-align: center;">Create Message</div>
+</button>
+"""
+
+view_button_html = """
+<button style="width: 200px; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: auto;">
+    <div style="font-size: 3em; margin-bottom: 10px;">📖</div>
+    <div style="text-align: center;">View Messages</div>
+</button>
+"""
+
 with col1:
-    if st.button("📝 Create Message", use_container_width=True):
+    if st.markdown(create_button_html, unsafe_allow_html=True):
         st.session_state.active_page = "create"
 
 with col2:
-    if st.button("🔍 Search Messages", use_container_width=True):
-        st.session_state.active_page = "search"
-
-with col3:
-    if st.button("📖 View All Messages", use_container_width=True):
+    if st.markdown(view_button_html, unsafe_allow_html=True):
         st.session_state.active_page = "view"
 
 # Handle different pages
@@ -187,23 +227,20 @@ if st.session_state.active_page == "create":
             st.session_state.active_page = "view"
             st.rerun()
 
-# Display messages (for both search and view pages)
-if st.session_state.active_page in ["search", "view"]:
+# Display messages (for view page)
+if st.session_state.active_page == "view":
     messages = load_messages()
     filtered_messages = messages
 
-    if st.session_state.active_page == "search":
-        st.markdown("### Search Results")
-        if search_query:
-            search_query = search_query.lower()
-            filtered_messages = [
-                msg for msg in filtered_messages
-                if search_query in msg['name'].lower() or 
-                search_query in msg['message'].lower() or 
-                any(search_query in tag.lower() for tag in msg.get('tags', []))
-            ]
-    else:
-        st.markdown("### All Messages")
+    # Apply search filter if query exists
+    if search_query:
+        search_query = search_query.lower()
+        filtered_messages = [
+            msg for msg in filtered_messages
+            if search_query in msg['name'].lower() or 
+            search_query in msg['message'].lower() or 
+            any(search_query in tag.lower() for tag in msg.get('tags', []))
+        ]
 
     # Apply tag filter
     if selected_tags:
